@@ -17,7 +17,7 @@ exports.register = async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      role: role ? role.toLowerCase() : "user" // ensure role is lowercase
+      role: role ? role.toLowerCase() : "user"
     });
 
     res.status(201).json({ message: "User registered successfully" });

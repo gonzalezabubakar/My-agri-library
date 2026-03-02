@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const API = "http://localhost:5000/api/resource";
+const API = "http://localhost:5000/api/resources";
 
 export default function Upload() {
   const navigate = useNavigate();
@@ -52,11 +52,22 @@ export default function Upload() {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`
+          // USIWEKE Content-Type ukiwa unatumia FormData
         },
         body: data
       });
 
-      const result = await res.json();
+      // 👇 Soma kwanza kama text ili kuepuka JSON crash
+      const text = await res.text();
+
+      let result;
+      try {
+        result = JSON.parse(text);
+      } catch (err) {
+        console.error("Server returned HTML instead of JSON:");
+        console.log(text);
+        throw new Error("Server error: Check backend route or server.");
+      }
 
       if (!res.ok) {
         throw new Error(result.message || "Upload failed");
@@ -64,7 +75,7 @@ export default function Upload() {
 
       alert("Resource uploaded successfully ✅");
 
-      // reset form
+      // Reset form
       setFormData({
         title: "",
         category: "Crops",
@@ -77,6 +88,7 @@ export default function Upload() {
       navigate("/home");
 
     } catch (error) {
+      console.error(error);
       alert(error.message);
     } finally {
       setLoading(false);
